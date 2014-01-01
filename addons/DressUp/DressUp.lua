@@ -32,7 +32,7 @@ _addon.commands = {'DressUp','du'}
 --Libs
 packets = require('packets')
 config = require('config')
-file = require('filehelper')
+file = require('files')
 require('luau')
 
 --DressUp files
@@ -131,7 +131,7 @@ windower.register_event('incoming chunk',function (id, data)
 			if character then
 				if windower.ffxi.get_player().follow_index == character.index then
 					blink_type = "follow"
-				elseif table.contains(make_party_ids(),parsed_pc["ID"]) then
+				elseif character.in_alliance then
 					blink_type = "party"
 				else
 					blink_type = "others"

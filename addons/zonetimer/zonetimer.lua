@@ -1,49 +1,63 @@
-_addon.name = 'Silence'
+_addon.name = 'zonetimer'
 _addon.author = 'Ihina'
-_addon.version = '1.0.1.1'
-_addon.command = 'silence'
+_addon.version = '1.0.0.0'
+_addon.command = 'zonetimer'
 
+require('logger')
 config = require('config')
+texts = require('texts')
+ 
 defaults = {}
-defaults.ShowOne = false
+defaults.pos = {}
+defaults.pos.x = 400
+defaults.pos.y = 0
+defaults.text = {}
+defaults.text.font = 'Arial'
+defaults.text.size = 12
+ 
 settings = config.load(defaults)
+times = texts.new(settings)
+zone = ''
 
-last = {}
-last['Equipment changed.'] = 0
-last['You cannot use that command at this time.'] = 0
-last['You cannot use that command while viewing the chat log.'] = 0
-last['You must close the currently open window to use that command.'] = 0
-last['Equipment removed.'] = 0
-last['You were unable to change your equipped items.'] = 0
-last['You cannot use that command while unconscious.'] = 0
-last['You cannot use that command while charmed.'] = 0
-last['You can only use that command during battle.'] = 0
-		
-windower.register_event('incoming text', function(str)
-	if last[str] then
-		if not settings.ShowOne then
-			return true
-		else
-			if os.clock() - last[str] < .75 then
-				return true
-			else
-				last[str] = os.clock()
-			end
-		end
+windower.register_event('prerender', function()
+	current_zone = windower.ffxi.get_info().zone
+	if zone == current_zone then
+		seconds = os.time() - start_time
+		times:text(os.date('!%H:%M:%S', seconds))
+		--times:text(seconds - start_time)
+		times:visible(true)
+	else
+		zone = current_zone
+		start_time = os.time()
 	end
 end)
 
+--[[for key,value in pairs(res.items) do log(key,value) end]]
+
 windower.register_event('addon command', function(...)
 	local param = L{...}
-	if param[1] == 'showone' then
-		if param[2] == 'true' then 
-			settings.ShowOne = true
-			print('-showone set to true-')
-		elseif param[2] == 'false' then 
-			settings.ShowOne = false
-			print('-showone set to false-')
+	local command = param[1]
+	if command == 'help' then
+		log("'zonetimer fontsize #' to change the font size" )
+		log("'zonetimer posX #' to change the x position")
+		log("'zonetimer posY #' to change the y position")
+	
+	elseif command == 'fontsize' or command == 'posX' or command == 'posY' then
+		
+		if command == 'fontsize' then
+			settings.text.size = param[2]
+		elseif command == 'posX' then
+			settings.pos.x = param[2]
+		elseif command == 'posY' then
+			settings.pos.x = param[2]
 		end
-		settings:save()
+
+		config.save(settings, 'all')
+		times:visible(false)
+		times = texts.new(settings)
+	elseif command == 'print' then
+		print(start_time .. " " .. os.time())
+	
 	end
 end)
 
@@ -59,7 +73,7 @@ modification, are permitted provided that the following conditions are met:
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name of Silence nor the
+    * Neither the name of zonetimer nor the
       names of its contributors may be used to endorse or promote products
       derived from this software without specific prior written permission.
 
@@ -74,4 +88,3 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
---Original plugin by Taj

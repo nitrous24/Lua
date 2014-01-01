@@ -130,38 +130,6 @@ function Dec2Hex(nValue)
 end
 
 -----------------------------------------------------------------------------------
---Name: split()
---Args:
----- msg (string): message to be subdivided
----- match (string/char): marker for subdivision
------------------------------------------------------------------------------------
---Returns:
----- Table containing string(s)
------------------------------------------------------------------------------------
-function split(msg, match)
-	local length = msg:len()
-	local splitarr = T{}
-	local u = 1
-	local match_len = match:gsub('%%',''):len()
-	if match_len == 0 then match_len = 1 end
-	while u <= length do
-		local nextanch = msg:find(match,u)
-		if nextanch ~= nil then
-			splitarr[#splitarr+1] = msg:sub(u,nextanch-match_len)
-			if nextanch~=length then
-				u = nextanch+match_len
-			else
-				u = length+1
-			end
-		else
-			splitarr[#splitarr+1] = msg:sub(u,length)
-			u = length+1
-		end
-	end
-	return splitarr
-end
-
------------------------------------------------------------------------------------
 --Name: fieldsearch()
 --Args:
 ---- message (string): Message to be searched
@@ -204,15 +172,15 @@ end
 ---- The "targ" table is blanked, and then the values from "new" are assigned to it
 ---- In the event that new is not passed, targ is not filled with anything.
 -----------------------------------------------------------------------------------
-function table.reassign(targ,new,weak)
+function table.reassign(targ,new,strength)
 	if new == nil then new = {} end
-	if weak then
+	if strength == true then
 		for i,v in pairs(new) do
 			if targ[i] == nil then targ[i] = v end
 		end
 	else
 		for i,v in pairs(targ) do
-			targ[i] = nil
+			if not new[i] then targ[i] = nil end
 		end
 		for i,v in pairs(new) do
 			targ[i] = v

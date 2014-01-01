@@ -32,16 +32,17 @@ if windower.dir_exists('../addons/shortcuts/data/') and logging then
 	logfile:flush()
 end
 
-file = require 'filehelper'
+file = require 'files'
 require 'sets'
 require 'helper_functions'
+require 'tables'
 
 require 'resources'
 require 'ambiguous_names'
 require 'targets'
 
 
-_addon.version = '1.6'
+_addon.version = '1.7'
 _addon.name = 'Shortcuts'
 _addon.author = 'Byrth'
 _addon.commands = {'shortcuts'}
@@ -158,7 +159,7 @@ function command_logic(original,modified)
 		else -- If there are excluded secondary commands (like /pcmd add <name>)
 			local tempcmd = command
 			local passback
-			for i,v in pairs(splitline) do -- Iterate over the potential secondary arguments.
+			for _,v in pairs(splitline) do -- Iterate over the potential secondary arguments.
 			-- I'm not sure when there could be more than one secondary argument, but it's ready if it happens.
 				if command2_list[command]:contains(v) then
 					tempcmd = tempcmd..' '..v
